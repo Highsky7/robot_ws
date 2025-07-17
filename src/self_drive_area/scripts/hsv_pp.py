@@ -27,19 +27,19 @@ class AdvancedHsvPlanner:
         self.cv_window_name = "Drivable Area Visualization (Advanced HSV)"
 
         # 파라미터
-        self.robot_base_frame = rospy.get_param('~robot_base_frame', 'camera_link') # 터틀봇의 경우 'base_footprint'가 더 적합할 수 있습니다.
-        self.path_lookahead = rospy.get_param('~path_lookahead', 1.5) # 경로 생성 시 내다볼 거리
+        self.robot_base_frame = rospy.get_param('~robot_base_frame', 'odom') # 터틀봇의 경우 'base_footprint'가 더 적합할 수 있습니다.
+        self.path_lookahead = rospy.get_param('~path_lookahead', 0.5) # 경로 생성 시 내다볼 거리
         self.num_path_points = rospy.get_param('~num_path_points', 15)
-        self.point_downsample_rate = rospy.get_param('~downsample', 5)
+        self.point_downsample_rate = rospy.get_param('~downsample', 20)
         self.smoothing_factor = rospy.get_param('~smoothing_factor', 0.4)
         
         # <<< 경로 추종 제어 파라미터 추가
-        self.lookahead_distance = rospy.get_param('~lookahead_distance', 0.7) # 로봇이 따라갈 전방 목표 지점 거리 (m)
+        self.lookahead_distance = rospy.get_param('~lookahead_distance', 0.3) # 로봇이 따라갈 전방 목표 지점 거리 (m)
         self.linear_velocity = rospy.get_param('~linear_velocity', 0.15) # 로봇의 최대 전진 속도 (m/s)
-        self.angular_gain = rospy.get_param('~angular_gain', 1.2) # 회전 제어 게인 (클수록 급격히 회전)
+        self.angular_gain = rospy.get_param('~angular_gain', 1.0) # 회전 제어 게인 (클수록 급격히 회전)
         
-        self.LOWER_MINT_HSV = np.array([100, 9, 55])
-        self.UPPER_MINT_HSV = np.array([140, 30, 220])
+        self.LOWER_MINT_HSV = np.array([0, 0, 0])
+        self.UPPER_MINT_HSV = np.array([179, 255, 205])
         self.kernel = np.ones((5, 5), np.uint8)
         self.smoothed_path_points = None
         

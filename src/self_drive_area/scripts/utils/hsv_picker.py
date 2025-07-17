@@ -9,7 +9,7 @@ def get_hsv_value(event, x, y, flags, param):
         print(f"Clicked Pixel BGR: {frame[y,x]}, HSV: {hsv_pixel[0][0]}")
 
 # 1단계에서 캡처한 이미지 파일의 경로를 입력하세요.
-image_path = '/home/highsky/Pictures/KakaoTalk_20250717_172943540.jpg'
+image_path = '/home/highsky/Desktop/KakaoTalk_20250717_212512196.jpg'
 frame = cv2.imread(image_path)
 
 if frame is None:
