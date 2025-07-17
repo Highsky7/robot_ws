@@ -18,34 +18,39 @@ import message_filters
 from cv_bridge import CvBridge
 
 class AdvancedHsvPlanner:
+    # hsv_pp.py의 __init__ 함수 전체 코드
     def __init__(self):
         rospy.loginfo("Initializing Advanced HSV Path Planner with Path Follower...")
         self.bridge = CvBridge()
         self.latest_color_msg, self.latest_depth_msg, self.latest_info_msg = None, None, None
         self.data_lock = threading.Lock()
-        
+
         self.cv_window_name = "Drivable Area Visualization (Advanced HSV)"
 
         # 파라미터
-        self.robot_base_frame = rospy.get_param('~robot_base_frame', 'odom') # 터틀봇의 경우 'base_footprint'가 더 적합할 수 있습니다.
-        self.path_lookahead = rospy.get_param('~path_lookahead', 0.5) # 경로 생성 시 내다볼 거리
+        self.robot_base_frame = rospy.get_param('~robot_base_frame', 'base_footprint')
+        self.path_lookahead = rospy.get_param('~path_lookahead', 0.5)
         self.num_path_points = rospy.get_param('~num_path_points', 15)
         self.point_downsample_rate = rospy.get_param('~downsample', 20)
         self.smoothing_factor = rospy.get_param('~smoothing_factor', 0.4)
+
+        # 경로 추종 제어 파라미터
+        self.lookahead_distance = rospy.get_param('~lookahead_distance', 0.3)
+        self.linear_velocity = rospy.get_param('~linear_velocity', 0.15)
+        self.angular_gain = rospy.get_param('~angular_gain', 1.0)
         
-        # <<< 경로 추종 제어 파라미터 추가
-        self.lookahead_distance = rospy.get_param('~lookahead_distance', 0.3) # 로봇이 따라갈 전방 목표 지점 거리 (m)
-        self.linear_velocity = rospy.get_param('~linear_velocity', 0.15) # 로봇의 최대 전진 속도 (m/s)
-        self.angular_gain = rospy.get_param('~angular_gain', 1.0) # 회전 제어 게인 (클수록 급격히 회전)
+        # <<< [핵심 수정] teleop 노드를 참고한 최대 속도 제한 파라미터 추가 (Waffle Pi 기준)
+        self.max_linear_velocity = rospy.get_param('~max_linear_velocity', 0.26)
+        self.max_angular_velocity = rospy.get_param('~max_angular_velocity', 1.82)
         
         self.LOWER_MINT_HSV = np.array([0, 0, 0])
         self.UPPER_MINT_HSV = np.array([179, 255, 205])
         self.kernel = np.ones((5, 5), np.uint8)
         self.smoothed_path_points = None
-        
+
         self.tf_buffer = tf2_ros.Buffer()
         self.tf_listener = tf2_ros.TransformListener(self.tf_buffer)
-        
+
         color_topic, depth_topic, info_topic = "/camera/color/image_raw/compressed", "/camera/aligned_depth_to_color/image_raw", "/camera/color/camera_info"
         color_sub, depth_sub, info_sub = message_filters.Subscriber(color_topic, CompressedImage), message_filters.Subscriber(depth_topic, Image), message_filters.Subscriber(info_topic, CameraInfo)
         self.ts = message_filters.ApproximateTimeSynchronizer([color_sub, depth_sub, info_sub], 2, 0.5)
@@ -53,8 +58,8 @@ class AdvancedHsvPlanner:
 
         self.path_pub = rospy.Publisher("/path", Path, queue_size=1)
         self.viz_pub = rospy.Publisher("/drivable_area/viz_2d", Image, queue_size=1)
-        self.cmd_vel_pub = rospy.Publisher('/cmd_vel', Twist, queue_size=1) # <<< 로봇 구동 명령 Publisher 추가
-        
+        self.cmd_vel_pub = rospy.Publisher('/cmd_vel', Twist, queue_size=1)
+
         self.processing_thread = threading.Thread(target=self.processing_loop, daemon=True)
         self.processing_thread.start()
         rospy.loginfo("Node initialization complete. Advanced HSV Planner is running.")
@@ -109,44 +114,45 @@ class AdvancedHsvPlanner:
             
             rate.sleep()
 
-    # <<< [핵심 추가] Pure Pursuit 알고리즘 기반 경로 추종 함수
+    # hsv_pp.py의 follow_the_path 함수 전체 코드
     def follow_the_path(self, path_msg):
         # 로봇의 기준 프레임(base_footprint)이 (0,0)에 있다고 가정합니다.
-        # path_msg의 좌표들은 이미 로봇 기준 프레임으로 변환되어 있습니다.
-        
-        # 1. Look-ahead distance에 가장 가까운 경로 포인트를 찾습니다.
         goal_point = None
-        for pose in reversed(path_msg.poses): # 경로의 끝점부터 탐색하여 가장 먼 지점을 우선으로 함
+        for pose in reversed(path_msg.poses):
             point_dist = math.sqrt(pose.pose.position.x**2 + pose.pose.position.y**2)
             if point_dist >= self.lookahead_distance:
                 goal_point = pose.pose.position
                 break
         
-        # 적절한 목표 지점을 찾지 못하면 마지막 점을 목표로 하거나 정지합니다.
         if goal_point is None and path_msg.poses:
             goal_point = path_msg.poses[-1].pose.position
         elif goal_point is None:
             self.stop_robot()
             return
             
-        # 2. 목표 지점까지의 각도(theta)를 계산합니다.
-        # atan2(y, x)를 사용하여 정확한 사분면의 각도를 구합니다.
         angle_to_goal = math.atan2(goal_point.y, goal_point.x)
         
-        # 3. 각속도(angular.z)를 계산합니다.
-        # 목표 지점과의 각도 차이에 비례하여 회전 속도를 결정합니다.
+        # <<< [핵심 수정 1] 감속 로직 완화
+        # 기존: turn_damping = 1.0 - min(1.0, abs(angle_to_goal) / (math.pi / 2))
+        # 변경: cos 함수를 이용하거나, 최소 감속률을 보장하여 0이 되는 것을 방지
+        # 예시: cos 함수를 사용하여 더 부드러운 감속 곡선 생성
+        # 90도(pi/2)일때 cos 값은 0이 되므로, 여전히 멈출 수 있다.
+        # 따라서 최소 속도를 보장하는 것이 더 효과적일 수 있다.
+        damping_factor = abs(angle_to_goal) / (math.pi / 2) # 0~1 사이 값 (90도일 때 1)
+        # 최소 20%의 속도는 유지하도록 변경
+        turn_damping = max(0.2, 1.0 - damping_factor) 
+        linear_x = self.linear_velocity * turn_damping
+        
         angular_z = self.angular_gain * angle_to_goal
         
-        # 4. 선속도(linear.x)를 결정합니다.
-        # 큰 각도로 회전 시 속도를 줄여 안정성을 높입니다.
-        # abs(angle_to_goal)이 클수록 감속량이 커집니다.
-        turn_damping = 1.0 - min(1.0, abs(angle_to_goal) / (math.pi / 2)) # 90도 이상 회전 시 0
-        linear_x = self.linear_velocity * turn_damping
+        # <<< [핵심 수정 2] 최종 속도를 로봇의 물리적 한계 내로 제한 (teleop 노드의 지혜)
+        final_linear_x = max(0.0, min(self.max_linear_velocity, linear_x))
+        final_angular_z = max(-self.max_angular_velocity, min(self.max_angular_velocity, angular_z))
 
         # 5. Twist 메시지를 생성하고 발행합니다.
         twist_cmd = Twist()
-        twist_cmd.linear.x = linear_x
-        twist_cmd.angular.z = angular_z
+        twist_cmd.linear.x = final_linear_x
+        twist_cmd.angular.z = final_angular_z
         self.cmd_vel_pub.publish(twist_cmd)
 
     # <<< [핵심 추가] 로봇 정지 함수

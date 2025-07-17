@@ -3,7 +3,7 @@
           args="0.15 0.0 0.11 0 0 0 odom camera_link 100" />
 
     <node pkg="self_drive_area" type="hsv_pp.py" name="advanced_hsv_planner" output="screen">
-        <param name="robot_base_frame" value="base_footprint"/>
+        <param name="robot_base_frame" value="odom"/>
         <param name="linear_velocity" value="0.12"/>
         <param name="angular_gain" value="1.2"/>
     </node>
