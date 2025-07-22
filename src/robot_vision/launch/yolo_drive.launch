@@ -1,0 +1,13 @@
+<launch>
+    <arg name="robot_base_frame"  default="base_link" />
+
+    <arg name="path_lookahead"    default="3.0" /> <arg name="num_path_points"   default="20" />  <arg name="smoothing_factor"  default="0.4" />
+
+    <node pkg="robot_vision" type="yolo_compressed.py" name="yolo_path_planner_node" output="screen">
+        <param name="robot_base_frame"  value="$(arg robot_base_frame)" />
+        <param name="path_lookahead"    value="$(arg path_lookahead)" />
+        <param name="num_path_points"   value="$(arg num_path_points)" />
+        <param name="smoothing_factor"  value="$(arg smoothing_factor)" />
+    </node>
+
+</launch>

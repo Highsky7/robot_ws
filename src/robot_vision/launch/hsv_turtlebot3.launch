@@ -1,0 +1,13 @@
+<launch>
+
+    <node pkg="robot_vision" type="hsv_pp.py" name="hsv_path_planner_node" output="screen">
+        <param name="robot_base_frame" value="base_link" />
+        <param name="path_lookahead" value="3.0" />
+        <param name="num_path_points" value="20" />
+        <param name="smoothing_factor" value="0.4" />
+        <param name="lower_hsv_bound" value="[1, 0, 0]" />
+        <param name="upper_hsv_bound" value="[255, 255, 255]" />
+        
+        <param name="max_linear_velocity"  value="0.15" /> <param name="max_angular_velocity" value="1.5" />  <param name="lookahead_distance"   value="0.4" />  </node>
+
+</launch>
