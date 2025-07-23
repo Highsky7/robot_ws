@@ -86,7 +86,7 @@ class UnifiedVisionNodeV1Optimized:
         self.ts.registerCallback(self.realsense_callback)
         rospy.loginfo(f"Synchronized subscribers started for Realsense on topic: {realsense_img_topic}")
         
-        usb_cam_topic = '/jetson/usb_cam/image/compressed'
+        usb_cam_topic = '/usb_cam/image_raw/compressed'
         self.usb_cam_sub = rospy.Subscriber(usb_cam_topic, CompressedImage, self.usb_cam_callback, queue_size=1, buff_size=2**24)
         rospy.loginfo(f"Subscriber for USB Cam started on topic: {usb_cam_topic}")
         rospy.loginfo("✅ Optimized Unified Vision Node v1 initialized successfully.")
