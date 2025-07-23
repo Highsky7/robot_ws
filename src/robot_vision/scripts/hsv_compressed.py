@@ -74,8 +74,8 @@ class CompetitionPathPlanner:
         depth_topic = "/camera/aligned_depth_to_color/image_raw"
         info_topic = "/camera/color/camera_info"
 
-        color_sub = message_filters.Subscriber(color_topic, CompressedImage)
-        depth_sub = message_filters.Subscriber(depth_topic, Image)
+        color_sub = message_filters.Subscriber(color_topic, CompressedImage, buff_size=2**24)
+        depth_sub = message_filters.Subscriber(depth_topic, Image, buff_size=2**24)
         info_sub = message_filters.Subscriber(info_topic, CameraInfo)
 
         self.ts = message_filters.ApproximateTimeSynchronizer(

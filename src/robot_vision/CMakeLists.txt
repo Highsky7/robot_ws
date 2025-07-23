@@ -169,6 +169,9 @@ catkin_install_python(PROGRAMS
   scripts/supply_tracker.py
   scripts/vision_detector.py
   scripts/yolo_compressed.py
+  scripts/image_decompressor.py
+  scripts/unified_vision_node_v1.py
+  scripts/unified_vision_node_v2.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 

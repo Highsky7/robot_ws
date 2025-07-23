@@ -18,7 +18,7 @@ class RealtimeObjectDetector:
 
         # YOLO 모델 로드 (학습된 가중치 파일 경로)
         # best.pt 파일을 이 스크립트와 같은 폴더에 위치시키거나 절대 경로를 지정하세요.
-        self.model_path = './vision_marker.pt'
+        self.model_path = './vision_marker2.pt'
         # GPU 사용 가능 여부 확인
         self.device = 'cuda' if torch.cuda.is_available() else 'cpu'
         rospy.loginfo(f"Using device: {self.device}")
