@@ -21,7 +21,7 @@ class ImageDecompressor:
 
         # --- 파라미터 설정 ---
         # 구독할 압축 이미지 토픽
-        compressed_topic = rospy.get_param('~compressed_topic', '/camera/color/image_raw/compressed')
+        compressed_topic = rospy.get_param('~compressed_topic', '/jetson/camera/image/compressed')
         # 발행할 Raw 이미지 토픽
         raw_topic = rospy.get_param('~raw_topic', '/camera/color/image_raw_uncompressed')
 

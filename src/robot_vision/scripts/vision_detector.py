@@ -31,7 +31,7 @@ class RealtimeObjectDetector:
 
         # CompressedImage 토픽 구독 설정
         self.image_sub = rospy.Subscriber(
-            "usb_cam/image_raw/compressed",
+            "/jetson/usb_cam/image_raw/compressed",
             CompressedImage,
             self.image_callback,
             queue_size=1,
