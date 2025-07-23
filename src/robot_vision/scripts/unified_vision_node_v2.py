@@ -162,7 +162,7 @@ class UnifiedVisionNodeV2:
                     x_cam, y_cam, z_cam = self.deproject_pixel_to_point(cx, cy, depth_in_meters)
                     point_msg = Point(x=z_cam, y=-x_cam, z=-y_cam)
                     self.distance_pub.publish(point_msg)
-                    label = f"Supply: D={point_msg.x:.2f}m"
+                    label = f"Supply Box: x={point_msg.x:.2f}m, y={point_msg.y:.2f}m, z={point_msg.z:.2f}m"
                     cv2.rectangle(color_image, (x1, y1), (x2, y2), (0, 255, 255), 2)
                     cv2.putText(color_image, label, (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 255), 2)
 
