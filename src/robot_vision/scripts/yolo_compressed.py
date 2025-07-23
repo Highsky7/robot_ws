@@ -36,7 +36,7 @@ class YoloPathPlanner:
         self.smoothing_factor = rospy.get_param('~smoothing_factor', 0.4)
 
         # --- YOLO 모델 관련 파라미터 ---
-        model_path = rospy.get_param('~yolo_model_path', '')
+        model_path = rospy.get_param('~yolo_model_path', './weights.pt')
         self.yolo_confidence = rospy.get_param('~yolo_confidence', 0.5)
         self.yolo_imgsz = rospy.get_param('~yolo_imgsz', 640)
         # ❗ 당신의 모델에서 '주행 가능 영역'에 해당하는 클래스 ID
