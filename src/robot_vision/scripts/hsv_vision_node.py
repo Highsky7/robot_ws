@@ -34,7 +34,7 @@ class HsvVisionNode:
             rospy.logerr(f"Failed to load YOLO models: {e}")
             rospy.signal_shutdown("Model loading failed.")
             return
-        lower_hsv_param = rospy.get_param('~lower_hsv_bound', '[80, 40, 75]')
+        lower_hsv_param = rospy.get_param('~lower_hsv_bound', '[0, 0, 0]')
         upper_hsv_param = rospy.get_param('~upper_hsv_bound', '[100, 255, 255]')
         self.lower_hsv_bound = np.array(ast.literal_eval(lower_hsv_param))
         self.upper_hsv_bound = np.array(ast.literal_eval(upper_hsv_param))
@@ -46,7 +46,7 @@ class HsvVisionNode:
         self.mask_pub = rospy.Publisher('/path_planning/hsv/mask', Image, queue_size=1)
         self.depth_for_path_pub = rospy.Publisher('/path_planning/hsv/depth', Image, queue_size=1)
         self.info_for_path_pub = rospy.Publisher('/path_planning/hsv/info', CameraInfo, queue_size=1)
-        realsense_img_topic = '/camera/color/image_raw/compressed' 
+        realsense_img_topic = '/camera/color/image_raw/compressed'
         depth_topic = "/camera/aligned_depth_to_color/image_raw"
         info_topic = "/camera/color/camera_info"
         realsense_img_sub = message_filters.Subscriber(realsense_img_topic, CompressedImage)
