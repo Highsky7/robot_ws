@@ -31,14 +31,15 @@ class UnifiedVisionNodeV1Optimized:
         self.proc_width = rospy.get_param('~proc_width', 320)
         self.proc_height = rospy.get_param('~proc_height', 320)
         rospy.loginfo(f"Processing images at resolution: {self.proc_width}x{self.proc_height}")
+        self.proc_width = rospy.get_param('~proc_width', 320)
 
         # 모델 로딩 (기존과 동일)
         try:
             supply_model_path = rospy.get_param('~supply_model_path', './tracking1.pt')
             self.supply_model = YOLO(supply_model_path).to(self.device)
-            marker_model_path = rospy.get_param('~marker_model_path', './vision_marker2.pt')
+            marker_model_path = rospy.get_param('~marker_model_path', './vision_enemy.pt')
             self.marker_model = YOLO(marker_model_path).to(self.device)
-            self.marker_class_names = ['A', 'E', 'Heart', 'K', 'M', 'O', 'R', 'Y']
+            self.marker_class_names = ['A', 'E', 'Enemy', 'Heart', 'K', 'M', 'O', 'R', 'ROKA', 'Y']
         except Exception as e:
             rospy.logerr(f"Failed to load YOLO models: {e}")
             rospy.signal_shutdown("Model loading failed.")
@@ -82,7 +83,7 @@ class UnifiedVisionNodeV1Optimized:
         depth_sub = message_filters.Subscriber(depth_topic, Image)
         info_sub = message_filters.Subscriber(info_topic, CameraInfo)
         
-        self.ts = message_filters.ApproximateTimeSynchronizer([realsense_img_sub, depth_sub, info_sub], queue_size=10, slop=0.2) # slop 값을 약간 늘려 동기화 안정성 확보
+        self.ts = message_filters.ApproximateTimeSynchronizer([realsense_img_sub, depth_sub, info_sub], queue_size=10, slop=0.5) # slop 값을 약간 늘려 동기화 안정성 확보
         self.ts.registerCallback(self.realsense_callback)
         rospy.loginfo(f"Synchronized subscribers started for Realsense on topic: {realsense_img_topic}")
         
