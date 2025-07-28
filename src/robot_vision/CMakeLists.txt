@@ -164,12 +164,12 @@ include_directories(
 ## Mark executable scripts (Python etc.) for installation
 ## in contrast to setup.py, you can choose the destination
 catkin_install_python(PROGRAMS
-  scripts/hsv_compressed.py
-  scripts/hsv_pp.py
-  scripts/supply_tracker.py
-  scripts/vision_detector.py
-  scripts/yolo_compressed.py
-  scripts/image_decompressor.py
+  scripts/yolo_vision_node.py
+  scripts/yolo_path_planning_pp.py
+  scripts/yolo_path_planning_node.py
+  scripts/hsv_vision_node.py
+  scripts/hsv_path_planning_node.py
+  scripts/hsv_path_planning_pp.py
   scripts/unified_vision_node_v1.py
   scripts/unified_vision_node_v2.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
