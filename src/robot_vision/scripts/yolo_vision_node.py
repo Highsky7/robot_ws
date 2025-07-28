@@ -34,7 +34,7 @@ class YoloVisionNode:
             rospy.logerr(f"Failed to load YOLO models: {e}")
             rospy.signal_shutdown("Model loading failed.")
             return
-        self.yolo_confidence = rospy.get_param('~yolo_confidence', 0.5)
+        self.yolo_confidence = rospy.get_param('~yolo_confidence', 0.7)
         self.drivable_class_index = rospy.get_param('~drivable_class_index', 0)
         self.scaled_camera_intrinsics = None
         self.distance_pub = rospy.Publisher('/supply_distance', Point, queue_size=1)

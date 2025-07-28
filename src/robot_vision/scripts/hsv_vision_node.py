@@ -21,8 +21,8 @@ class HsvVisionNode:
         self.bridge = CvBridge()
         self.device = 'cuda' if torch.cuda.is_available() else 'cpu'
         rospy.loginfo(f"Using compute device: {self.device}")
-        self.proc_width = rospy.get_param('~proc_width', 320)
-        self.proc_height = rospy.get_param('~proc_height', 320)
+        self.proc_width = rospy.get_param('~proc_width', 640)
+        self.proc_height = rospy.get_param('~proc_height', 480)
         rospy.loginfo(f"Processing images at {self.proc_width}x{self.proc_height}")
         try:
             supply_model_path = rospy.get_param('~supply_model_path', './tracking1.pt')
