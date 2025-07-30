@@ -4,6 +4,11 @@
     <rosparam command="load" file="$(find robot_control_pc)/config/teleop_twist_joy.yaml"/>
   </node>
   <node pkg="robot_control_pc" type="twist_to_diff" name="twist_to_diff"/>
+
+  <!-- 매니퓰레이터 관련 노드 (joy_controller_node.cpp) -->
+  <node pkg="joy_teleop" type="joy_controller_node" name="joy_controller_node"/>
+
+  
   <node pkg="robot_control_pc" type="network_sender.py" name="network_sender" output="screen">
     <param name="jetson_ip" value="192.168.0.215"/> </node>
 </launch>
