@@ -28,9 +28,9 @@ class HsvVisionNode:
             # 기존 모델 로드
             supply_model_path = rospy.get_param('~supply_model_path', './tracking1.pt')
             self.supply_model = YOLO(supply_model_path).to(self.device)
-            marker_model_path = rospy.get_param('~marker_model_path', './vision_enemy.pt')
+            marker_model_path = rospy.get_param('~marker_model_path', './vision_marker2.pt')
             self.marker_model = YOLO(marker_model_path).to(self.device)
-            self.marker_class_names = ['A', 'E', 'Enemy', 'Heart', 'K', 'M', 'O', 'R', 'ROKA', 'Y']
+            self.marker_class_names = ['A', 'E', 'Heart', 'K', 'M', 'O', 'R', 'Y']
 
 
             new_model_path = rospy.get_param('~new_model_path', './traffic_light.pt')
@@ -41,8 +41,8 @@ class HsvVisionNode:
             rospy.logerr(f"Failed to load YOLO models: {e}")
             rospy.signal_shutdown("Model loading failed.")
             return
-        lower_hsv_param = rospy.get_param('~lower_hsv_bound', '[0, 0, 0]')
-        upper_hsv_param = rospy.get_param('~upper_hsv_bound', '[100, 255, 255]')
+        lower_hsv_param = rospy.get_param('~lower_hsv_bound', '[12, 13, 85]')
+        upper_hsv_param = rospy.get_param('~upper_hsv_bound', '[38, 29, 148]')
         self.lower_hsv_bound = np.array(ast.literal_eval(lower_hsv_param))
         self.upper_hsv_bound = np.array(ast.literal_eval(upper_hsv_param))
         self.kernel = np.ones((5, 5), np.uint8)
