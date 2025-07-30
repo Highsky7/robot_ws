@@ -35,13 +35,13 @@ public:
     JoyController() : nh_("~") // Private NodeHandle 사용
     {
         // ROS 파라미터 서버에서 설정 값 불러오기 (없으면 기본값 사용)
-        nh_.param<double>("deadzone", deadzone_, 0.9);
+        nh_.param<double>("deadzone", deadzone_, 0);
         nh_.param<int>("enable_button_l", enable_button_l, joy_mapping::BUTTON_ENABLE_L); 
         nh_.param<int>("enable_button_r", enable_button_r, joy_mapping::BUTTON_ENABLE_R);
         
 
         // 퍼블리셔와 서브스크라이버 초기화
-        joy_pub_ = nh_.advertise<std_msgs::String>("joy_input", 10);
+        joy_pub_ = nh_.advertise<std_msgs::String>("/joy_input", 10);
         joy_sub_ = nh_.subscribe<sensor_msgs::Joy>("/joy", 10, &JoyController::joyCallback, this);
         
 
