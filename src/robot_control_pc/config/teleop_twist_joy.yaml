@@ -1,0 +1,19 @@
+axis_linear: 1               # 왼쪽 스틱 세로축
+scale_linear: 0.6            # 노멀 모드 최대 0.6 m/s
+scale_linear_turbo: 1.2      # 터보 모드 최대 1.2 m/s
+axis_linear_deadzone: 0.15
+
+axis_angular: 0              # 왼쪽 스틱 가로축
+scale_angular: 1.5
+scale_angular_turbo: 3.0
+axis_angular_deadzone: 0.15
+
+button_linear_positive: 7
+button_linear_negative: 6
+button_angular_positive: 5
+button_angular_negative: 4
+
+enable_button: 4
+enable_turbo_button: 5
+auto_enable: true
+autorepeat_rate: 20.0

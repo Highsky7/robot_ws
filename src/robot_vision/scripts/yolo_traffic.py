@@ -32,7 +32,7 @@ class YoloVisionNode:
             self.path_model = YOLO(path_model_path).to(self.device)
             self.marker_class_names = ['A', 'E', 'Enemy', 'Heart', 'K', 'M', 'O', 'R', 'ROKA', 'Y']
 
-            new_model_path = rospy.get_param('~new_model_path', './traffic_light.pt') 
+            new_model_path = rospy.get_param('~new_model_path', './traffic_light.pt')
             self.new_detection_model = YOLO(new_model_path).to(self.device)
             self.new_model_class_names = ['red', 'green']
 

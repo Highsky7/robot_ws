@@ -1,0 +1,9 @@
+<launch>
+  <node pkg="joy" type="joy_node" name="joy_node"/>
+  <node pkg="teleop_twist_joy" type="teleop_node" name="teleop_twist_joy">
+    <rosparam command="load" file="$(find robot_control_pc)/config/teleop_twist_joy.yaml"/>
+  </node>
+  <node pkg="robot_control_pc" type="twist_to_diff" name="twist_to_diff"/>
+  <node pkg="robot_control_pc" type="network_sender.py" name="network_sender" output="screen">
+    <param name="jetson_ip" value="192.168.0.215"/> </node>
+</launch>
