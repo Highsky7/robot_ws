@@ -24,7 +24,7 @@ class YoloVisionNode:
         self.proc_height = rospy.get_param('~proc_height', 480)
         try:
             # 기존 모델 로드
-            supply_model_path = rospy.get_param('~supply_model_path', './tracking1.pt')
+            supply_model_path = rospy.get_param('~supply_model_path', './tracking2.pt')
             self.supply_model = YOLO(supply_model_path).to(self.device)
             marker_model_path = rospy.get_param('~marker_model_path', './vision_enemy.pt')
             self.marker_model = YOLO(marker_model_path).to(self.device)
