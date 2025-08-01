@@ -41,8 +41,8 @@ class HsvVisionNode:
             rospy.logerr(f"Failed to load YOLO models: {e}")
             rospy.signal_shutdown("Model loading failed.")
             return
-        lower_hsv_param = rospy.get_param('~lower_hsv_bound', '[12, 13, 85]')
-        upper_hsv_param = rospy.get_param('~upper_hsv_bound', '[38, 29, 148]')
+        lower_hsv_param = rospy.get_param('~lower_hsv_bound', '[0, 0, 50]')
+        upper_hsv_param = rospy.get_param('~upper_hsv_bound', '[100, 40, 220]')
         self.lower_hsv_bound = np.array(ast.literal_eval(lower_hsv_param))
         self.upper_hsv_bound = np.array(ast.literal_eval(upper_hsv_param))
         self.kernel = np.ones((5, 5), np.uint8)
